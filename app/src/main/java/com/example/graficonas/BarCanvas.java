@@ -14,17 +14,19 @@ import androidx.core.content.ContextCompat;
 
 public class BarCanvas extends View {
     public static final String[] MONTHS = new String[]{"E", "F", "M", "A", "M", "J"};
-    public static final float[] DATA = new float[]{1, .4f, .5f, .4f, .25f, .9f};
-    private static final float PADDING = 0;
+    public static final String[] LEVELS = new String[]{"0", "25", "50", "75", "100"};
+    public static final float[] DATA = new float[]{1, .4f, .5f, .4f, .6f, .9f};
+    private static final float PADDING = 20;
     private static final float GRID_THICKNESS_PX = 10;
     private static final float GUIDELINE_THICKNESS_PX = 3;
-    private static final float SPACE_BETWEEN_BARS = 90;
+    private static final float SPACE_BETWEEN_BARS = 110;
     private static final float SPACE_BETWEEN_DASH_AVERAGE_LINE = 10f;
     private static final float TEXT_SIZE_DP = 16;
 
     float averageLinePosition  = .3f;
 
     Paint barPaint;
+    Paint blueBarPaint;
     Paint gridPaint;
     Paint averageLinePaint;
     Path averageLinePath;
@@ -89,7 +91,16 @@ public class BarCanvas extends View {
         textPaint.setAntiAlias(true);
         textPaint.setTextSize(TEXT_SIZE_DP * getResources().getDisplayMetrics().density);
         textPaint.setColor(ContextCompat.getColor(getContext(), R.color.white));
+
+        blueBarPaint = new Paint();
+        blueBarPaint.setStyle(Paint.Style.FILL);
+        blueBarPaint.setColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
     }
+
+    Path newBarPath = new Path();
+    Path blueBarPath = new Path();
+
+
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -98,24 +109,51 @@ public class BarCanvas extends View {
         //draw grid
         canvas.drawLine(gridLeft, gridBottom, gridRight, gridBottom, gridPaint);
 
-        //draw gridline
-        canvas.drawPath(averageLinePath, averageLinePaint);
-
         //Draw bars
         float totalColumnSpacing = SPACE_BETWEEN_BARS * (MONTHS.length + 1);
         float columnWidth  = (gridRight - gridLeft - totalColumnSpacing) / MONTHS.length;
         float columnLeft = gridLeft + SPACE_BETWEEN_BARS;
         float columnRight = columnLeft + columnWidth;
 
+        final float VERTEX_OFFSET = -30f;
+        final float BLUE_QUANTITY = 0.4f;
+
+        for (int i = 0 ; i < LEVELS.length; i++) {
+            canvas.drawText(LEVELS[i], 0, gridBottom - (((float) (height - PADDING * 2)/LEVELS.length) * i)  , textPaint);
+        }
+
         for (int i = 0 ; i < MONTHS.length; i++){
             float top = gridTop + height * (1f - DATA[i]);
-            canvas.drawRect(columnLeft, top, columnRight, gridBottom, barPaint);
+            float blueTop = gridTop - height * (1f - (1 - BLUE_QUANTITY));
+
+            newBarPath.moveTo(columnLeft, top - VERTEX_OFFSET);
+            newBarPath.lineTo(columnLeft, gridBottom - VERTEX_OFFSET);
+            newBarPath.lineTo(columnRight, gridBottom );
+            newBarPath.lineTo(columnRight, top );
+            newBarPath.lineTo(columnLeft,top - VERTEX_OFFSET);
+            newBarPath.close();
+            canvas.drawPath(newBarPath, barPaint);
+
+            if(i == 3) {
+                blueBarPath.moveTo(columnLeft, (top + blueTop) - VERTEX_OFFSET);
+                blueBarPath.lineTo(columnLeft, top - VERTEX_OFFSET);
+                blueBarPath.lineTo(columnRight, top);
+                blueBarPath.lineTo(columnRight, top + blueTop);
+                blueBarPath.lineTo(columnLeft, (top + blueTop) - VERTEX_OFFSET);
+                blueBarPath.close();
+                canvas.drawPath(blueBarPath, blueBarPaint);
+            }
+
+            //draw gridline
+
+//            canvas.drawRect(columnLeft, top, columnRight, gridBottom, barPaint);
             canvas.drawText(MONTHS[i], columnLeft, gridBottom + (30 * getResources().getDisplayMetrics().density), textPaint);
 
             columnLeft = columnRight + SPACE_BETWEEN_BARS;
             columnRight = columnLeft + columnWidth;
         }
 
+        canvas.drawPath(averageLinePath, averageLinePaint);
     }
 
 }

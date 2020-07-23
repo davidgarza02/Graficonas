@@ -6,7 +6,8 @@
     android:background="?android:selectableItemBackground"
     android:layout_gravity="bottom"
     android:layout_height="wrap_content"
-    tools:background="@color/bbva_blue">
+    tools:background="@color/bbva_blue"
+    android:paddingTop="40dp">
     
     <com.example.graficonas.BarCanvas
         android:layout_width="match_parent"
