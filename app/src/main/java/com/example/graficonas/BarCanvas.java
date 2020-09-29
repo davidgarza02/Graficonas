@@ -100,8 +100,6 @@ public class BarCanvas extends View {
     Path newBarPath = new Path();
     Path blueBarPath = new Path();
 
-
-
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
