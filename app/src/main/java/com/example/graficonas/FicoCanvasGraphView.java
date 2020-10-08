@@ -143,7 +143,6 @@ public class FicoCanvasGraphView extends View {
                 break;
             }
         }
-
     }
 
     public void updateHorizontalLimit(float limit) {
